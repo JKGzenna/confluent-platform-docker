@@ -1,0 +1,47 @@
+INSTRUCCIONES ( https://kafka-tutorials.confluent.io/join-a-stream-to-a-table/kstreams.html#initialize-the-project )
+
+MOVIES
+docker exec -i schema-registry /usr/bin/kafka-avro-console-producer --topic movies --bootstrap-server broker:29092 --property value.schema="$(< src/main/avro/movie.avsc)"
+
+{"id": 294, "title": "Die Hard", "release_year": 1988}
+{"id": 354, "title": "Tree of Life", "release_year": 2011}
+{"id": 782, "title": "A Walk in the Clouds", "release_year": 1995}
+{"id": 128, "title": "The Big Lebowski", "release_year": 1998}
+{"id": 780, "title": "Super Mario Bros.", "release_year": 1993}
+
+ESTE TOPIC CREARA UN STREAMBUILDER SERIALIZADO LLAMADO REKEYED MOVIES
+
+
+
+RATINGS
+docker exec -i schema-registry /usr/bin/kafka-avro-console-producer --topic ratings --bootstrap-server broker:29092 --property value.schema="$(< src/main/avro/rating.avsc)"
+
+{"id": 294, "rating": 8.2}
+{"id": 294, "rating": 8.5}
+{"id": 354, "rating": 9.9}
+{"id": 354, "rating": 9.7}
+{"id": 782, "rating": 7.8}
+{"id": 782, "rating": 7.7}
+{"id": 128, "rating": 8.7}
+{"id": 128, "rating": 8.4}
+{"id": 780, "rating": 2.1}
+
+
+
+RATED MOVIES SE PRODUCE SOLO AUTOMATICAMENTE, VER POR CONTROL CENTER O MEDIANTE EL SIGUIENTE COMANDO
+docker exec -it schema-registry /usr/bin/kafka-avro-console-consumer --topic rated-movies --bootstrap-server broker:9092 --from-beginning
+
+SE DEBERIA VER EL SIGUINTE RESULTADO
+{"id":294,"title":"Die Hard","release_year":1988,"rating":8.2}
+{"id":294,"title":"Die Hard","release_year":1988,"rating":8.5}
+{"id":354,"title":"Tree of Life","release_year":2011,"rating":9.9}
+{"id":354,"title":"Tree of Life","release_year":2011,"rating":9.7}
+{"id":782,"title":"A Walk in the Clouds","release_year":1995,"rating":7.8}
+{"id":782,"title":"A Walk in the Clouds","release_year":1995,"rating":7.7}
+{"id":128,"title":"The Big Lebowski","release_year":1998,"rating":8.7}
+{"id":128,"title":"The Big Lebowski","release_year":1998,"rating":8.4}
+{"id":780,"title":"Super Mario Bros.","release_year":1993,"rating":2.1}
+
+
+
+java -jar build/libs/kstreams-stream-table-join-standalone-0.0.1-SNAPSHOT.jar configuration/dev.properties
